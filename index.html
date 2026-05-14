@@ -1,1 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galactic Vocabulary Archives</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap');
 
+        body {
+            background-color: #050505;
+            background-image: radial-gradient(circle at center, #151515 0%, #000000 100%);
+            color: #fff;
+            /* Main reading font is Arial for maximum readability */
+            font-family: Arial, Helvetica, sans-serif;
+            font-weight: bold;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .menu-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            width: 100%;
+            max-width: 1300px;
+            padding: 20px;
+        }
+
+        .main-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 52px;
+            letter-spacing: 6px;
+            color: #ffe81f; /* Star Wars Gold */
+            text-shadow: 0 0 15px rgba(255, 232, 31, 0.7);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        
+        /* 10 Distinct Neon Colors */
+        .color-1 { color: #ffa500; border-color: #ffa500; text-shadow: 0 0 8px #ffa500; } /* Orange */
+        .color-2 { color: #00bfff; border-color: #00bfff; text-shadow: 0 0 8px #00bfff; } /* Sky Blue */
+        .color-3 { color: #ffffff; border-color: #ffffff; text-shadow: 0 0 8px #ffffff; } /* White */
+        .color-4 { color: #bc13fe; border-color: #bc13fe; text-shadow: 0 0 8px #bc13fe; } /* Purple */
+        .color-5 { color: #1e90ff; border-color: #1e90ff; text-shadow: 0 0 8px #1e90ff; } /* Dodger Blue */
+        .color-6 { color: #ff0000; border-color: #ff0000; text-shadow: 0 0 8px #ff0000; } /* Red */
+        .color-7 { color: #ff69b4; border-color: #ff69b4; text-shadow: 0 0 8px #ff69b4; } /* Hot Pink */
+        .color-8 { color: #ffff00; border-color: #ffff00; text-shadow: 0 0 8px #ffff00; } /* Yellow */
+        .color-9 { color: #00ffff; border-color: #00ffff; text-shadow: 0 0 8px #00ffff; } /* Cyan */
+        .color-10 { color: #39ff14; border-color: #39ff14; text-shadow: 0 0 8px #39ff14; } /* Neon Green */
+
+        #rank-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .rank-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .rank-btn {
+            background: rgba(0, 0, 0, 0.7);
+            border-width: 4px;
+            border-style: solid;
+            border-radius: 15px;
+            width: 100%;
+            height: 160px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+        }
+
+        .rank-btn:hover {
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .btn-theme {
+            font-size: 28px;
+            font-weight: 900;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .btn-character {
+            font-size: 13px;
+            font-weight: bold;
+            opacity: 0.8;
+            letter-spacing: 1px;
+        }
+
+        .progress-text {
+            color: #666;
+            font-size: 13px;
+            font-family: monospace;
+        }
+
+        .back-btn {
+            background: transparent;
+            border: 2px solid #555;
+            color: #888;
+            padding: 12px 35px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            text-transform: uppercase;
+            border-radius: 5px;
+        }
+        .back-btn:hover { background: #444; color: #fff; }
+
+        /* Flashcard Area */
+        #flashcard-area {
+            display: none;
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .hud {
+            position: absolute;
+            top: 20px;
+            font-size: 22px;
+            font-family: monospace;
+            color: #444;
+        }
+
+        #progress-hud { left: 40px; text-align: left; }
+        #score-hud { right: 40px; text-align: right; }
+        .score-correct { color: #39ff14; }
+        .score-failed { color: #ff003c; }
+
+        #sentence-container {
+            position: absolute;
+            top: 48%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 85%;
+            display: flex;
+            flex-direction: column;
+            gap: 60px;
+        }
+
+        /* Readability Settings */
+        .state-def { 
+            font-size: 3.8vw; 
+            color: #ff8c00; /* Vibrant Orange */
+            line-height: 1.3;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        } 
+        
+        .state-word { 
+            font-size: 7vw; 
+            color: #39ff14; /* Neon Green */
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 0 0 20px rgba(57, 255, 20, 0.5);
+        } 
+
+        .controls-hint {
+            position: absolute; 
+            bottom: 30px; 
+            width: 100%; 
+            color: #333; 
+            font-family: monospace; 
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="main-menu" class="menu-container">
+        <h1 class="main-title">Archives</h1>
+        <div id="rank-grid"></div>
+    </div>
+
+    <div id="flashcard-area">
+        <div id="progress-hud" class="hud">Module: <span id="hud-set" style="color: #888;"></span><br>Entry <span id="hud-current">0</span> / <span id="hud-total">0</span></div>
+        <div id="score-hud" class="hud">Correct: <span id="hud-correct" class="score-correct">0</span><br>Failed: <span id="hud-failed" class="score-failed">0</span></div>
+        
+        <div id="sentence-container">
+            <div id="def-text" class="state-def"></div>
+            <div id="word-text" class="state-word" style="visibility: hidden;"></div>
+        </div>
+
+        <div class="controls-hint">
+            [UP] Reveal | [RIGHT] Correct | [LEFT] Failed | [DOWN] Undo | [ESC] Exit
+        </div>
+    </div>
+
+    <div id="results-screen" class="menu-container" style="display: none; height: 100vh; justify-content: center;">
+        <h1 style="font-size: 60px; color: #ffe81f; margin-bottom: 10px;">MISSION COMPLETE</h1>
+        <div style="font-size: 72px; margin-bottom: 20px;">Score: <span id="res-percentage">0</span>%</div>
+        <div style="font-size: 38px; margin-bottom: 40px;">
+            <span class="score-correct">Correct: <span id="res-correct">0</span></span> | 
+            <span class="score-failed">Failed: <span id="res-failed">0</span></span>
+        </div>
+        <button class="back-btn" onclick="showMainMenu()">Return to Command Center</button>
+    </div>
+
+    <script>
+        const ranks = [
+            { id: "crime", theme: "Crime", char: "Youngling", color: "color-1" },
+            { id: "finance", theme: "Finance", char: "Padawan", color: "color-2" },
+            { id: "building", theme: "Building", char: "Stormtrooper", color: "color-3" },
+            { id: "gastronomy", theme: "Gastronomy", char: "Moon Trooper", color: "color-4" },
+            { id: "medical", theme: "Medical", char: "Jedi Knight", color: "color-5" },
+            { id: "education", theme: "Education", char: "Sith Lord", color: "color-6" },
+            { id: "legal", theme: "Legal", char: "Jedi Master", color: "color-7" },
+            { id: "travel", theme: "Travel", char: "Darth Vader", color: "color-8" },
+            { id: "religion", theme: "Religion", char: "Obi-Wan Kenobi", color: "color-9" },
+            { id: "nature", theme: "Nature", char: "Grandmaster Yoda", color: "color-10" }
+        ];
+
+        const vocabularyData = {
+            "crime": [
+                { def: "You do something bad and a person records you. They say, \"Give me money or I will show this video to everyone.\" What is this crime?", word: "Blackmail" },
+                { def: "You need money but the bank says no. You borrow from a dangerous man who asks for a lot of extra money back. Who is this criminal?", word: "Loan Shark" },
+                { def: "Some bad men come to your shop. They say, \"Give us money every month or we will hurt your business.\" What is this crime?", word: "Extortion" },
+                { def: "A person takes phones or wallets from people's pockets in crowded places. No one sees him. Who is this criminal?", word: "Pickpocket" },
+                { def: "You take items like cigarettes, phones, or perfume into a country secretly. You do not tell the officers because you do not want to pay tax. What is this crime?", word: "Smuggle" },
+                { def: "A person is paid to start a fire and burn a building or a house. Who is this criminal?", word: "Arsonist" },
+                { def: "You want a license for your shop. A government worker says, \"Give me money personally or you will not get the license.\" What is this crime?", word: "Bribery" },
+                { def: "Bad people take a child. They tell the parents, \"Pay us $500,000 or we will kill your son.\" What is this amount of money called?", word: "Ransom" },
+                { def: "Two people are fighting. Suddenly, one person pulls out a gun and kills the other person. What is this crime?", word: "Murder" },
+                { def: "A person sells fake things but says they are original. He tricks you to get your money. What is this crime?", word: "Swindle" },
+                { def: "A group of people takes control of a plane by force. The passengers cannot leave. What do we call these passengers?", word: "Hostages" },
+                { def: "There is a war and it is hard to find oil. People sell it illegally for a very high price. What is this called?", word: "Black Market" }
+            ],
+            "finance": [
+                { def: "You have a job and you earn money. Every month, you must give some of this money to the government. What is this money called?", word: "Tax" },
+                { def: "You borrowed money to buy a car but you did not pay it back. Now, the bank takes your car away by force. What is this action called?", word: "Seize" },
+                { def: "You work for a company. At the end of every month, your boss pays you for your work. What is this money called?", word: "Salary" },
+                { def: "You borrow $1,000 from a bank. When you pay it back, you must pay $1,100. The extra $100 is the price for borrowing. What is this extra money?", word: "Interest" },
+                { def: "You want to buy a house. You pay a small part of the money at the beginning and the rest later. What is this first payment?", word: "Initial Payment" },
+                { def: "Your friend wants a loan, but the bank doesn't trust him. You sign a paper and say, \"If he doesn't pay, I will pay.\" Who are you?", word: "Guarantor" },
+                { def: "You buy a TV for $600. You decide to pay $50 every month for one year instead of all at once. What is each monthly payment called?", word: "Installment" },
+                { def: "The bank says you must pay your bill by the 15th of the month. The 15th is the last day to pay. What is this date?", word: "Due Date" },
+                { def: "You borrow money from a bank. This bank is now waiting for you to pay them back. Who is this company?", word: "Creditor" },
+                { def: "You want to start a new company. You need a lot of money at the beginning to buy an office. What is this starting money called?", word: "Capital" },
+                { def: "You rent a flat. You give the owner extra money at the start. You get it back if the flat is clean when you leave. What is this money?", word: "Caution Money" },
+                { def: "You borrowed money from a friend. Now you owe your friend money. In this situation, who are you?", word: "Debtor" }
+            ],
+            "building": [
+                { def: "You are in a big city. You see a very tall building with 100 floors that almost touches the clouds. What is this building called?", word: "Skyscraper" },
+                { def: "It is raining hard outside, but you are dry because the top part of the house protects you. What is this part of the house?", word: "Roof" },
+                { def: "You rent an apartment. Every month, you pay your rent to the person who owns the building. Who is this person?", word: "Landlord" },
+                { def: "Dirty water from your toilet goes into large pipes under the street. What is this underground system called?", word: "Sewer" },
+                { def: "You want to buy a house. You go to a professional who helps people buy and sell property. Who is this person?", word: "Real Estate Agent" },
+                { def: "You go down the stairs to a floor that is below the ground level. It is often used for storage. What is this part of the building?", word: "Basement" },
+                { def: "You pay money every month to live in an apartment that belongs to someone else. In this situation, who are you?", word: "Tenant" },
+                { def: "You are looking up at the flat surface above you where the light is hanging. What is this part of the room?", word: "Ceiling" },
+                { def: "You are in the kitchen and you want water. You turn a handle and water starts to flow out. What is this object called?", word: "Tap" },
+                { def: "You push your phone charger into the small holes in the wall to get electricity. What is this called?", word: "Power Outlet" },
+                { def: "You go to a very large building with many different shops and restaurants inside. What is this place?", word: "Mall" },
+                { def: "The water pipe is broken and there is water on the floor. You call a worker to fix it. Who is this professional?", word: "Plumber" }
+            ],
+            "gastronomy": [
+                { def: "You put a large piece of meat in the oven for a long time until it is brown. What is this cooking method?", word: "Roast" },
+                { def: "You put food in your mouth and chew it. Then, the food goes down your throat to your stomach. What is this action?", word: "Swallow" },
+                { def: "You put a large piece of meat through a machine to get very small pieces for burgers. What is this called?", word: "Minced Meat" },
+                { def: "You need fresh apples and tomatoes. You go to a shop that only sells fruit and vegetables. Who is this shop?", word: "Greengrocer" },
+                { def: "You have a fish, but you have not cooked it yet. It is not on the fire or in the oven. How do we describe this food?", word: "Raw" },
+                { def: "You put tea leaves in hot water and wait for the flavor to come out. What is this action?", word: "Brew" },
+                { def: "You go to this shop to buy fresh bread, cookies, or a cake. What is this shop called?", word: "Bakery" },
+                { def: "You are looking at milk, cheese, butter, and yogurt. What are these products called?", word: "Dairy" },
+                { def: "This shop sells high-quality cheeses, cold meats, and special salads. What is this shop?", word: "Deli" },
+                { def: "This is a famous Italian food made from flour and water, like spaghetti. What is this food?", word: "Pasta" },
+                { def: "You go to a professional who cuts and sells fresh lamb or beef. Who is this person?", word: "Butcher" },
+                { def: "Your tea is very hot, so you drink only a very small amount at one time. What is this action called?", word: "Sip" }
+            ],
+            "medical": [
+                { def: "A doctor cuts your body to fix a problem while you are in a deep sleep. What is this operation called?", word: "Surgery" },
+                { def: "You feel like the room is spinning around you and you cannot walk straight. What is this feeling?", word: "Dizziness" },
+                { def: "A person suddenly loses consciousness and falls to the floor because they are sick. What is this action?", word: "Faint" },
+                { def: "A person has a serious brain injury. They are alive, but they cannot speak, think, or move. What is this state?", word: "Vegetative Existence" },
+                { def: "You feel sick in your stomach and you think you are going to vomit. What is this feeling?", word: "Nausea" },
+                { def: "This person helps move patients in wheelchairs or beds in a hospital. Who is this worker?", word: "Orderly" },
+                { def: "You go to the toilet many times and your waste is liquid. What is this medical problem?", word: "Diarrhea" },
+                { def: "A person is bleeding very heavily and losing a lot of blood after an accident. What is this called?", word: "Hemorrhage" },
+                { def: "This is a medical procedure to end a pregnancy before the baby is born. What is this called?", word: "Abortion" },
+                { def: "You hurt your ankle. Later, it becomes bigger, rounder, and painful. What does your ankle do?", word: "Swell" },
+                { def: "A very sick patient is connected to machines to stay alive. What is this equipment called?", word: "Life Support Unit" },
+                { def: "You want to go to the toilet, but it is very difficult because you cannot go easily. What is this problem?", word: "Constipation" }
+            ],
+            "education": [
+                { def: "You finish university. There is a ceremony and you get your diploma. What is this event called?", word: "Graduation" },
+                { def: "You talk to a teacher who gives you advice and helps you make a plan for your future. What is this help called?", word: "Guidance" },
+                { def: "You go to the school gym to run and do exercises to stay healthy. What is this lesson called?", word: "P.T. (Physical Training)" },
+                { def: "You work at a company for a short time to learn the job before you graduate. What is this work called?", word: "Internship" },
+                { def: "The lesson finishes and you have 15 minutes to talk to friends before the next class. What is this time called?", word: "Break" },
+                { def: "A student is rude, so the teacher makes him stay at school after the lessons are over. What does the teacher do?", word: "Punish" },
+                { def: "The teacher looks at a list to see which students are in the classroom today. What is this list called?", word: "Register" },
+                { def: "You go to the office and pay the fee to join a new course. What is this action?", word: "Enroll" },
+                { def: "You don't know the answers in an exam, so you look at your friend's paper secretly. What is this action?", word: "Cheat" },
+                { def: "A young person works with a professional mechanic to learn the job. Who is this young worker?", word: "Apprentice" },
+                { def: "You need to buy new pens, pencils, and notebooks for your lessons. What is the name for these items?", word: "Stationery" },
+                { def: "This person is an expert who has many years of experience and teaches others. Who is this person?", word: "Master" }
+            ],
+            "legal": [
+                { def: "You see a man steal a bag. Later, you go to court to tell the judge what you saw. Who are you?", word: "Witness" },
+                { def: "Someone breaks your car. They must pay you money so you can fix it. What is this money called?", word: "Compensation" },
+                { def: "A judge says, \"You don't go to jail, but a police officer will check on you for one year.\" What is this called?", word: "Probation" },
+                { def: "The police take a man to the station and say, \"We think you stole this phone.\" What is this action?", word: "Accuse" },
+                { def: "Divorced parents go to court because they both want the children to live with them. What is this situation called?", word: "Child Custody" },
+                { def: "You watch your friend sign a paper, and then you sign to show it is the truth. What is this action?", word: "Attest" },
+                { def: "A person is in court, but the judge finds out he did nothing wrong. How do we describe this person?", word: "Innocent" },
+                { def: "A person starts a legal case against a company that sold them a broken car. Who is this person?", word: "Plaintiff" },
+                { def: "People write a letter to the government to ask for a new park and many people sign it. What is this paper?", word: "Petition" },
+                { def: "A person pays money to the court so they can go home and wait for their trial. What is this money?", word: "Bail" },
+                { def: "A divorced parent must pay money every month for the child's food and clothes. What is this money?", word: "Child Alimony" },
+                { def: "A woman is in court to explain that she did not commit a crime. Who is she?", word: "Defendant" }
+            ],
+            "travel": [
+                { def: "You look for the white stripes on the road where cars stop for you to walk. What is this place?", word: "Zebra Crossing" },
+                { def: "You walk down the narrow space between the seats on a plane to find your place. What is this path?", word: "Aisle" },
+                { def: "You go underground to take a train that moves under the streets. What is this system?", word: "Subway" },
+                { def: "You go to a big station where many large, comfortable buses arrive and leave. What is this place?", word: "Coach Station" },
+                { def: "You stay on the safe path for people next to a busy street. What is this part of the road?", word: "Sidewalk" },
+                { def: "You fly to one city, but you must stop there to change planes for your final destination. What is this flight?", word: "Connecting Flight" },
+                { def: "Your car breaks down on the highway. You move it to the side of the road to be safe. What is this lane?", word: "Safety Lane" },
+                { def: "Your suitcases are very heavy. The airline says you must pay extra money. What do we call these bags?", word: "Excess Luggage" },
+                { def: "You come to a place where two roads meet and cross each other like an \"X\". What is this place called?", word: "Crossroads" },
+                { def: "You go to a very small shop on the street to buy a newspaper or water. What is this shop?", word: "Kiosk" },
+                { def: "You are sitting on a train or a bus. You are not the driver. Who are you?", word: "Passenger" },
+                { def: "You arrive at the airport, but your bag is missing. You go to an office to report it. What is this office called?", word: "Lost Luggage Claim" }
+            ],
+            "religion": [
+                { def: "You do something that your faith says is bad or wrong. What is this action called?", word: "Sin" },
+                { def: "Many people believe that one day the world will come to an end. What is this day called?", word: "Doomsday" },
+                { def: "You close your eyes and talk to God to say thank you or ask for help. What is this action?", word: "Prayer" },
+                { def: "Something wonderful happens that is impossible according to science. What is this event?", word: "Miracle" },
+                { def: "People believe that when our bodies die, our souls continue to live in another place. What is this called?", word: "Afterlife" },
+                { def: "You go on a long journey to visit a holy city because of your faith. What is this journey?", word: "Pilgrimage" },
+                { def: "This person receives a special message from God and teaches other people. Who is this person?", word: "Prophet" },
+                { def: "You choose not to eat or drink from morning until evening for your faith. What is this action?", word: "Fasting" },
+                { def: "This is a system of beliefs about God with its own rules and holy book. What is this called?", word: "Religion" },
+                { def: "This is a holy being from heaven who has wings and protects people. What is this being?", word: "Angel" },
+                { def: "This person starts saying things that the leaders of their religion say are wrong. Who is this person?", word: "Heretic" },
+                { def: "Inside one big religion, there is a smaller group with different ideas. What is this group called?", word: "Sect" }
+            ],
+            "nature": [
+                { def: "During a storm, there is a bright flash of light and a loud noise from the sky. What is this called?", word: "Thunderbolt" },
+                { def: "You are on low land with high mountains on your left and right. What is this place called?", word: "Valley" },
+                { def: "Frozen balls of ice fall from the sky like rain. What is this called?", word: "Hail" },
+                { def: "There is no rain for a very long time and the ground is dry. What is this situation?", word: "Drought" },
+                { def: "It rains too much and the water covers the streets and houses. What is this called?", word: "Flood" },
+                { def: "This is a piece of land surrounded by water on three sides. What is this called?", word: "Peninsula" },
+                { def: "This is a very hot place with no water and only sand and rocks. What is this place?", word: "Desert" },
+                { def: "A huge amount of snow falls down a mountain very fast. What is this called?", word: "Avalanche" },
+                { def: "You find a large, natural hole in a mountain and you go inside. What is this place?", word: "Cave" },
+                { def: "This is a large part of the sea that is partly surrounded by land. What is this called?", word: "Gulf" },
+                { def: "The ground under your feet starts to shake and move very hard. What is this called?", word: "Earthquake" },
+                { def: "A large amount of rocks and earth suddenly falls down a hill. What is this called?", word: "Landslide" }
+            ]
+        };
+
+        let currentRank = '', activeDeck = [], currentIndex = 0;
+        let isFlipped = false, scoreCorrect = 0, scoreFailed = 0, isActive = false, scoreHistory = [];
+        let completedRanks = JSON.parse(localStorage.getItem('sw_def_progress_v2')) || [];
+
+        function initMenu() {
+            const grid = document.getElementById('rank-grid');
+            grid.innerHTML = '';
+            
+            ranks.forEach(rank => {
+                const isDone = completedRanks.includes(rank.id);
+                const total = vocabularyData[rank.id].length;
+                
+                const container = document.createElement('div');
+                container.className = 'rank-container';
+                
+                const btn = document.createElement('button');
+                btn.className = `rank-btn ${rank.color}`;
+                if(isDone) btn.style.opacity = "0.4";
+                
+                btn.innerHTML = `
+                    <span class="btn-theme">${rank.theme}</span>
+                    <span class="btn-character">${rank.char}</span>
+                    ${isDone ? '<span style="font-size: 20px; margin-top: 5px;">✓</span>' : ''}
+                `;
+                
+                btn.onclick = () => startTraining(rank);
+
+                const prog = document.createElement('div');
+                prog.className = 'progress-text';
+                prog.innerText = isDone ? `CLEARED` : `${total} Entries`;
+                
+                container.appendChild(btn);
+                container.appendChild(prog);
+                grid.appendChild(container);
+            });
+        }
+
+        function hideAll() {
+            ['main-menu', 'flashcard-area', 'results-screen'].forEach(id => document.getElementById(id).style.display = 'none');
+        }
+
+        function showMainMenu() { hideAll(); initMenu(); document.getElementById('main-menu').style.display = 'flex'; isActive = false; }
+
+        function startTraining(rankObj) {
+            currentRank = rankObj;
+            activeDeck = [...vocabularyData[rankObj.id]].sort(() => Math.random() - 0.5);
+            currentIndex = 0; scoreCorrect = 0; scoreFailed = 0; scoreHistory = []; isActive = true;
+            hideAll(); 
+            document.getElementById('flashcard-area').style.display = 'block';
+            document.getElementById('hud-set').innerText = rankObj.theme;
+            document.getElementById('hud-total').innerText = activeDeck.length;
+            updateHUD(); displayCard();
+        }
+
+        function updateHUD() {
+            document.getElementById('hud-current').innerText = currentIndex + 1;
+            document.getElementById('hud-correct').innerText = scoreCorrect;
+            document.getElementById('hud-failed').innerText = scoreFailed;
+        }
+
+        function displayCard() {
+            document.getElementById('def-text').innerText = activeDeck[currentIndex].def;
+            document.getElementById('word-text').innerText = activeDeck[currentIndex].word;
+            document.getElementById('word-text').style.visibility = 'hidden';
+            isFlipped = false;
+        }
+
+        function flipCard() { if (!isFlipped) { document.getElementById('word-text').style.visibility = 'visible'; isFlipped = true; } }
+
+        function nextCard() {
+            currentIndex++;
+            if (currentIndex >= activeDeck.length) endExercise(`Victory for the ${currentRank.char}!`);
+            else { updateHUD(); displayCard(); }
+        }
+
+        function endExercise(msg) {
+            isActive = false; hideAll();
+            if (currentIndex >= activeDeck.length && !completedRanks.includes(currentRank.id)) {
+                completedRanks.push(currentRank.id);
+                localStorage.setItem('sw_def_progress_v2', JSON.stringify(completedRanks));
+            }
+            let total = scoreCorrect + scoreFailed;
+            document.getElementById('results-screen').style.display = 'flex';
+            document.getElementById('results-message').innerText = msg;
+            document.getElementById('res-percentage').innerText = total === 0 ? 0 : Math.round((scoreCorrect / total) * 100);
+            document.getElementById('res-correct').innerText = scoreCorrect;
+            document.getElementById('res-failed').innerText = scoreFailed;
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (!isActive) return;
+            if (e.key === 'ArrowUp') flipCard();
+            else if (e.key === 'ArrowRight' && isFlipped) { scoreHistory.push('correct'); scoreCorrect++; nextCard(); }
+            else if (e.key === 'ArrowLeft' && isFlipped) { scoreHistory.push('failed'); scoreFailed++; nextCard(); }
+            else if (e.key === 'ArrowDown' && currentIndex > 0) {
+                currentIndex--; 
+                const last = scoreHistory.pop();
+                if (last === 'correct') scoreCorrect--; if (last === 'failed') scoreFailed--;
+                updateHUD(); displayCard(); 
+                document.getElementById('word-text').style.visibility = 'visible'; isFlipped = true;
+            } else if (e.key === 'Escape') endExercise("Session Aborted");
+        });
+
+        initMenu();
+    </script>
+</body>
+</html>
